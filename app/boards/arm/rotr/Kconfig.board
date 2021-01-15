@@ -1,0 +1,8 @@
+# ROTR board configuration
+
+# Copyright (c) 2021 Polarity Works
+# SPDX-License-Identifier: MIT
+
+config BOARD_ROTR
+	bool "ROTR"
+	depends on SOC_STM32F303XC

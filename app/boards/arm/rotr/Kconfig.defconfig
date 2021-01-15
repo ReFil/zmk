@@ -1,0 +1,18 @@
+# ROTR board configuration
+
+# Copyright (c) 2021 Polarity Works
+# SPDX-License-Identifier: MIT
+
+if BOARD_ROTR
+
+config BOARD
+	default "rotr"
+
+config ZMK_USB
+	default y
+
+CONFIG_ZMK_RGB_UNDERGLOW=y
+# Use the STRIP config specific to the LEDs you're using
+CONFIG_WS2812_STRIP=y
+
+endif # BOARD_ROTR

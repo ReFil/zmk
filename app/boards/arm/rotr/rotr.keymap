@@ -1,0 +1,15 @@
+#include <behaviors.dtsi>
+#include <dt-bindings/zmk/keys.h>
+
+/ {
+	keymap {
+		compatible = "zmk,keymap";
+
+		default_layer {
+			//PREV | PLAY/PAUSE | NEXT
+			bindings = <
+				&kp C_PREV &kp C_PP &kp C_NEXT
+			>;
+		};
+	};
+};
