@@ -11,6 +11,9 @@ config BOARD
 config ZMK_USB
 	default y
 
+config ZMK_KEYBOARD_NAME
+	default "ROTR"
+
 CONFIG_ZMK_RGB_UNDERGLOW=y
 # Use the STRIP config specific to the LEDs you're using
 CONFIG_WS2812_STRIP=y

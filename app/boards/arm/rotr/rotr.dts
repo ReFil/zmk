@@ -12,11 +12,11 @@
 	compatible = "rotr", "st,stm32f303";
 
 	chosen {
-		zephyr,code-partition = &code_partition;
 		zephyr,sram = &sram0;
 		zephyr,flash = &flash0;
 		zmk,kscan = &kscan0;
 		zmk,underglow = &led_strip;
+		zephyr,code-partition = &code_partition;
 	};
 
 	kscan0: kscan {
@@ -55,7 +55,7 @@
 		#address-cells = <1>;
 		#size-cells = <1>;
 		boot_partition: partition@0 {
-			label = "adafruit_boot";
+			label = "boot_partition";
 			reg = <0x00000000 0x00004000>;
 		};
 		code_partition: partition@4000 {
