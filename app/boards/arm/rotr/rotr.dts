@@ -41,10 +41,6 @@
 	status = "okay";
 };
 
-&rtc {
-	status = "okay";
-};
-
 &flash0 {
 	/*
 	 * For more information, see:
@@ -90,7 +86,7 @@
 &spi2 {
 
   led_strip: ws2812@0 {
-    compatible = "worldsemi,ws2812-spi";
+    compatible = "worldsemi,ws2812";
     label = "WS2812";
 
     /* SPI */
@@ -98,8 +94,8 @@
     spi-max-frequency = <5250000>;
 
     /* WS2812 */
-    chain-length = <3>; /* number of LEDs */
-    spi-one-frame = <0x70>;
-    spi-zero-frame = <0x40>;
+    chain-length = <1>; /* number of LEDs */
+    spi-one-frame = <0x7f>;
+    spi-zero-frame = <0x03>;
   };
 };
