@@ -8,7 +8,7 @@
 		default_layer {
 			//PREV | PLAY/PAUSE | NEXT
 			bindings = <
-				&kp C_PREV &kp C_PP &kp C_NEXT
+				&kp C_VOL_UP &kp C_VOL_UP &kp C_VOL_UP
 			>;
 		};
 	};

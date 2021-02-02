@@ -18,8 +18,6 @@ config ZMK_KSCAN_MATRIX_POLLING
 	default y
 
 
-CONFIG_ZMK_RGB_UNDERGLOW=y
-# Use the STRIP config specific to the LEDs you're using
-CONFIG_WS2812_STRIP=y
+
 
 endif # BOARD_ROTR
