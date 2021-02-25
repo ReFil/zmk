@@ -1,10 +1,10 @@
 # Copyright (c) 2021 Polarity Works
 # SPDX-License-Identifier: MIT
 
-if BOARD_CRBN60
+if BOARD_BT60
 
 config BOARD
-	default "crbn60"
+	default "bt60"
 
 if USB
 
@@ -27,8 +27,8 @@ config ZMK_USB
 
 config ZMK_BATTERY_VOLTAGE_DIVIDER
 	default y
-	
-config ZMK_KEYBOARD_NAME
-	default "CRBN60"
 
-endif # BOARD_CRBN60
+config ZMK_KEYBOARD_NAME
+	default "BT60"
+
+endif # BOARD_BT60

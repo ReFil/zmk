@@ -1,5 +1,5 @@
-identifier: crbn60
-name: crbn60
+identifier: bt60
+name: bt60
 type: mcu
 arch: arm
 toolchain:
