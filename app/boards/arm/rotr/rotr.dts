@@ -5,11 +5,11 @@
  */
 
 /dts-v1/;
-#include <st/f3/stm32f303Xc.dtsi>
+#include <nordic/nrf52840_qiaa.dtsi>
 
 / {
 	model = "ROTR";
-	compatible = "rotr", "st,stm32f303";
+	compatible = "rotr";
 
 	chosen {
 		zephyr,sram = &sram0;
@@ -22,47 +22,116 @@
 	kscan0: kscan {
 		compatible = "zmk,kscan-gpio-matrix";
 		label = "KSCAN";
+		diode-direction = "col2row";
+
 		row-gpios
-			= <&gpiob 11 (GPIO_ACTIVE_HIGH | GPIO_PULL_DOWN)>
+			= <&gpio1 13 (GPIO_ACTIVE_HIGH | GPIO_PULL_DOWN)>
 		;
 		col-gpios
-			= <&gpiob 5 GPIO_ACTIVE_HIGH>
-			, <&gpiob 4 GPIO_ACTIVE_HIGH>
-			, <&gpiob 3  GPIO_ACTIVE_HIGH>
+			= <&gpio0 2 GPIO_ACTIVE_HIGH>
+			, <&gpio0 3 GPIO_ACTIVE_HIGH>
+			, <&gpio1 15  GPIO_ACTIVE_HIGH>
 		;
 	};
+
+	ext-power {
+		compatible = "zmk,ext-power-generic";
+		label = "EXT_POWER";
+		control-gpios = <&gpio1 11 GPIO_ACTIVE_HIGH>;
+	};
+
 	/*sensors {
 		 compatible = "zmk,keymap-sensors";
-		 sensors = <&encoder0>;
+		 sensors = <&left_encoder>;
 	};*/
+
+	left_encoder: encoder_left {
+        compatible = "alps,ec11";
+        label = "LEFT_ENCODER";
+        a-gpios = <&gpio1 0 (GPIO_ACTIVE_HIGH | GPIO_PULL_UP)>;
+        b-gpios = <&gpio1 6 (GPIO_ACTIVE_HIGH | GPIO_PULL_UP)>;
+        resolution = <4>;
+        status = "okay";
+    };
+
+	vbatt {
+		compatible = "zmk,battery-voltage-divider";
+		label = "BATTERY";
+		io-channels = <&adc 2>;
+		output-ohms = <2000000>;
+		full-ohms = <(2000000 + 806000)>;
+	};
 };
 
-&usb {
+&adc {
 	status = "okay";
 };
+
+&gpiote {
+	status = "okay";
+};
+
+&gpio0 {
+	status = "okay";
+};
+
+&gpio1 {
+	status = "okay";
+};
+
+&i2c0 {
+	compatible = "nordic,nrf-twi";
+	sda-pin = <17>;
+	scl-pin = <20>;
+};
+
+&uart0 {
+	compatible = "nordic,nrf-uarte";
+	tx-pin = <6>;
+	rx-pin = <8>;
+};
+
+&usbd {
+	status = "okay";
+};
+
 
 &flash0 {
 	/*
 	 * For more information, see:
-	 * http://docs.zephyrproject.org/latest/guides/dts/index.html#flash-partitions
+	 * http://docs.zephyrproject.org/latest/devices/dts/flash_partitions.html
 	 */
 	partitions {
 		compatible = "fixed-partitions";
 		#address-cells = <1>;
 		#size-cells = <1>;
-		boot_partition: partition@0 {
-			label = "boot_partition";
-			reg = <0x00000000 0x00004000>;
+
+		sd_partition: partition@0 {
+			label = "softdevice";
+			reg = <0x00000000 0x00026000>;
 		};
-		code_partition: partition@4000 {
+		code_partition: partition@26000 {
 			label = "code_partition";
-			reg = <0x00004000 0x0003a800>;
+			reg = <0x00026000 0x000c6000>;
 		};
 
-		/* Set 6Kb of storage at the end of the 256Kb of flash */
-		storage_partition: partition@3e800 {
+		/*
+		 * The flash starting at 0x000ec000 and ending at
+		 * 0x000f3fff is reserved for use by the application.
+		 */
+
+		/*
+		 * Storage partition will be used by FCB/LittleFS/NVS
+		 * if enabled.
+		 */
+		storage_partition: partition@ec000 {
 			label = "storage";
-			reg = <0x0003e800 0x00001800>;
+			reg = <0x000ec000 0x00008000>;
+		};
+
+		boot_partition: partition@f4000 {
+			label = "adafruit_boot";
+			reg = <0x000f4000 0x0000c000>;
 		};
 	};
 };
@@ -84,6 +153,12 @@
 */
 
 &spi2 {
+	compatible = "nordic,nrf-spim";
+	status = "okay";
+	mosi-pin = <5>;
+	// Unused pins, needed for SPI definition, but not used by the ws2812 driver itself.
+	sck-pin = <6>;
+	miso-pin = <7>;
 
   led_strip: ws2812@0 {
     compatible = "worldsemi,ws2812-spi";
@@ -91,12 +166,12 @@
 
     /* SPI */
     reg = <0>;
-    spi-max-frequency = <5250000>;
+    spi-max-frequency = <4000000>;
 
     /* WS2812 */
-    chain-length = <1>; /* number of LEDs */
-    spi-one-frame = <0x7f>;
-    spi-zero-frame = <0x03>;
+    chain-length = <3>; /* number of LEDs */
+    spi-one-frame = <0x70>;
+    spi-zero-frame = <0x40>;
   };
 	status = "okay";
 };

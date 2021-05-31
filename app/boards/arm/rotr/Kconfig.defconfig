@@ -8,16 +8,29 @@ if BOARD_ROTR
 config BOARD
 	default "rotr"
 
+if USB
+
+config USB_NRFX
+	default y
+
+config USB_DEVICE_STACK
+	default y
+
+endif # USB
+
+config BT_CTLR
+	default BT
+
+config ZMK_BLE
+	default y
+
 config ZMK_USB
+	default y
+
+config ZMK_BATTERY_VOLTAGE_DIVIDER
 	default y
 
 config ZMK_KEYBOARD_NAME
 	default "ROTR"
-
-config ZMK_KSCAN_MATRIX_POLLING
-	default y
-
-
-
 
 endif # BOARD_ROTR

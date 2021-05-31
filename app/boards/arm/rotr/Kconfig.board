@@ -5,4 +5,4 @@
 
 config BOARD_ROTR
 	bool "ROTR"
-	depends on SOC_STM32F303XC
+	depends on SOC_NRF52840_QIAA

@@ -1,5 +1,6 @@
 #include <behaviors.dtsi>
 #include <dt-bindings/zmk/keys.h>
+#include <dt-bindings/zmk/rgb.h>
 
 / {
 	keymap {
@@ -8,8 +9,9 @@
 		default_layer {
 			//PREV | PLAY/PAUSE | NEXT
 			bindings = <
-				&kp C_VOL_UP &kp C_VOL_UP &kp C_VOL_UP
+				&kp C_VOL_UP &rgb_ug RGB_TOG &kp C_VOL_DN
 			>;
+			sensor-bindings = <&inc_dec_kp C_VOL_UP C_VOL_DN>;
 		};
 	};
 };
