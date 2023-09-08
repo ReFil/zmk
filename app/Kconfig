@@ -245,6 +245,10 @@ config BT_PERIPHERAL_PREF_LATENCY
 config BT_PERIPHERAL_PREF_TIMEOUT
     default 400
 
+config ZMK_PROFILESWITCH
+    bool "Enable two state profile switch"
+    default n
+
 #ZMK_BLE
 endif
 

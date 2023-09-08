@@ -1,0 +1,14 @@
+# Copyright (c) 2020 The ZMK Contributors
+# SPDX-License-Identifier: MIT
+
+description: |
+  Generic driver for controlling the bluetooth profile on the
+  switch-gpio pin status
+  (Only in supported hardware)
+
+compatible: "zmk,profile-switch"
+
+properties:
+  switch-gpios:
+    type: phandle-array
+    required: true
