@@ -1,0 +1,9 @@
+/ {
+    behaviors {
+        stp: behavior_stp_indicators {
+            compatible = "zmk,behavior-stp-indicators";
+            label = "STP";
+            #binding-cells = <1>;
+        };
+    };
+};

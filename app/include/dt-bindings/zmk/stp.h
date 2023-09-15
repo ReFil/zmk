@@ -1,0 +1,1 @@
+#define STP_BAT 0

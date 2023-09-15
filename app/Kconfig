@@ -368,6 +368,25 @@ config ZMK_RGB_UNDERGLOW_AUTO_OFF_USB
 #ZMK_RGB_UNDERGLOW
 endif
 
+menuconfig ZMK_STP_INDICATORS
+    bool "STP Specific indicators"
+    select LED_STRIP
+    select ZMK_LOW_PRIORITY_WORK_QUEUE
+    select ZMK_HID_INDICATORS
+
+if ZMK_STP_INDICATORS
+
+# This default value cuts down on tons of excess .conf files, if you're using GPIO, manually disable this
+config SPI
+    default y
+
+config ZMK_STP_INDICATORS_BRT_MAX
+    int "RGB underglow maximum brightness in percent"
+    range 0 100
+    default 100
+
+endif
+
 menuconfig ZMK_BACKLIGHT
     bool "LED backlight"
     select LED
@@ -687,7 +706,7 @@ if ZMK_LOW_PRIORITY_WORK_QUEUE
 
 config ZMK_LOW_PRIORITY_THREAD_STACK_SIZE
     int "Low priority thread stack size"
-    default 768
+    default 1024
 
 config ZMK_LOW_PRIORITY_THREAD_PRIORITY
     int "Low priority thread priority"
