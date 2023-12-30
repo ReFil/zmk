@@ -1,0 +1,51 @@
+# Copyright (c) 2023 The ZMK Contributors
+# SPDX-License-Identifier: MIT
+
+menuconfig GEN4
+    bool "Cirque Gen4 trackpads"
+    depends on GPIO
+    depends on I2C
+    help
+      Enable driver for Cirque Gen4 trackpads
+
+if GEN4
+
+choice
+    prompt "Trigger mode"
+    default GEN4_TRIGGER_NONE
+    help
+      Specify the type of triggering to be used by the driver.
+
+config GEN4_TRIGGER_NONE
+    bool "No trigger"
+
+config GEN4_TRIGGER_GLOBAL_THREAD
+    bool "Use global thread"
+    depends on GPIO
+    select GEN4_TRIGGER
+
+config GEN4_TRIGGER_OWN_THREAD
+    bool "Use own thread"
+    depends on GPIO
+    select GEN4_TRIGGER
+
+endchoice
+
+config GEN4_TRIGGER
+    bool
+
+config GEN4_THREAD_PRIORITY
+    int "Thread priority"
+    depends on GEN4_TRIGGER_OWN_THREAD
+    default 10
+    help
+      Priority of thread used by the driver to handle interrupts.
+
+config GEN4_THREAD_STACK_SIZE
+    int "Thread stack size"
+    depends on GEN4_TRIGGER_OWN_THREAD
+    default 1024
+    help
+      Stack size of thread used by the driver to handle interrupts.
+
+endif # GEN4

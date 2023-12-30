@@ -1,0 +1,9 @@
+description: |
+  Sensor driver for the Cirque Gen4 trackpad ASICs
+compatible: "cirque,gen4"
+include: ["i2c-device.yaml"]
+
+properties:
+  dr-gpios:
+    type: phandle-array
+    description: Data ready pin for the trackpad
