@@ -1,0 +1,8 @@
+# STP board configuration
+
+# Copyright (c) 2023 Polarity Works
+# SPDX-License-Identifier: MIT
+
+config BOARD_STP
+    bool "stp"
+    depends on SOC_NRF52840_QIAA
