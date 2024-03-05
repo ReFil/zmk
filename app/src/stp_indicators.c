@@ -227,6 +227,14 @@ static void zmk_stp_indicators_bluetooth(struct k_work *work) {
 }
 
 static void zmk_stp_indicators_caps(struct k_work *work) {
+    if (ble_status.prof) {
+        color0.h = 240;
+        color0.s = 100;
+    } else if (usb) {
+        color0.h = 120;
+        color0.s = 100;
+    } else
+        color0.s = 0;
     // Set LED on if capslock pressed
     if (caps)
         color0.b = CONFIG_ZMK_STP_INDICATORS_BRT_MAX;
