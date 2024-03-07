@@ -52,8 +52,8 @@ struct zmk_stp_ble {
     bool connected;
 };
 
-static struct zmk_led_hsb color0;
-static struct zmk_led_hsb color1;
+static struct zmk_led_hsb color0; // BLE Led
+static struct zmk_led_hsb color1; // Caps
 
 static struct zmk_stp_ble ble_status;
 static bool caps;
@@ -152,12 +152,12 @@ static void zmk_stp_indicators_batt(struct k_work *work) {
 static void zmk_stp_indicators_blink_work(struct k_work *work) {
     LOG_DBG("Blink work triggered");
     // If LED on turn off and vice cersa
-    if (color1.b)
-        color1.b = 0;
+    if (color0.b)
+        color0.b = 0;
     else
-        color1.b = CONFIG_ZMK_STP_INDICATORS_BRT_MAX;
+        color0.b = CONFIG_ZMK_STP_INDICATORS_BRT_MAX;
     // Convert HSB to RGB and update LEDs
-    pixels[1] = hsb_to_rgb(color1);
+    pixels[0] = hsb_to_rgb(color0);
     int err = led_strip_update_rgb(led_strip, pixels, STRIP_NUM_PIXELS);
     if (err < 0) {
         LOG_ERR("Failed to update the RGB strip (%d)", err);
@@ -180,10 +180,10 @@ static void zmk_stp_indicators_bluetooth(struct k_work *work) {
     LOG_DBG("BLE PROFILE: %d", ble_status.prof);
 
     if (ble_status.prof) {
-        color1.h = 240;
-        color1.s = 100;
+        color0.h = 240;
+        color0.s = 100;
     } else
-        color1.s = 0;
+        color0.s = 0;
     // If in USB HID mode
     if (usb) {
         LOG_DBG("USB MODE");
@@ -192,34 +192,34 @@ static void zmk_stp_indicators_bluetooth(struct k_work *work) {
         k_timer_stop(&fast_blink_timer);
         k_timer_stop(&connected_timeout_timer);
         // Set LED to green
-        color1.h = 120;
-        color1.s = 100;
-        color1.b = CONFIG_ZMK_STP_INDICATORS_BRT_MAX;
+        color0.h = 120;
+        color0.s = 100;
+        color0.b = CONFIG_ZMK_STP_INDICATORS_BRT_MAX;
     } else if (ble_status.open) {
         LOG_DBG("BLE PROF OPEN");
         // If profile is open (unpaired) start fast blink timer and ensure LED turns on
-        color1.b = CONFIG_ZMK_STP_INDICATORS_BRT_MAX;
+        color0.b = CONFIG_ZMK_STP_INDICATORS_BRT_MAX;
         k_timer_stop(&slow_blink_timer);
         k_timer_stop(&connected_timeout_timer);
         k_timer_start(&fast_blink_timer, K_NO_WAIT, K_MSEC(200));
     } else if (!ble_status.connected) {
         LOG_DBG("BLE PROF NOT CONN");
         // If profile paired but not connected start slow blink timer and ensure LED on
-        color1.b = CONFIG_ZMK_STP_INDICATORS_BRT_MAX;
+        color0.b = CONFIG_ZMK_STP_INDICATORS_BRT_MAX;
         k_timer_stop(&fast_blink_timer);
         k_timer_stop(&connected_timeout_timer);
         k_timer_start(&slow_blink_timer, K_NO_WAIT, K_MSEC(750));
     } else {
         LOG_DBG("BLE PROF CONN");
         // If connected start the 3 second timeout to turn LED off
-        color1.b = CONFIG_ZMK_STP_INDICATORS_BRT_MAX;
+        color0.b = CONFIG_ZMK_STP_INDICATORS_BRT_MAX;
         k_timer_stop(&slow_blink_timer);
         k_timer_stop(&fast_blink_timer);
         k_timer_start(&connected_timeout_timer, K_SECONDS(3), K_NO_WAIT);
     }
     // Convert HSB to RGB and update the LEDs
 
-    pixels[1] = hsb_to_rgb(color1);
+    pixels[0] = hsb_to_rgb(color0);
     int err = led_strip_update_rgb(led_strip, pixels, STRIP_NUM_PIXELS);
     if (err < 0) {
         LOG_ERR("Failed to update the RGB strip (%d)", err);
@@ -227,21 +227,21 @@ static void zmk_stp_indicators_bluetooth(struct k_work *work) {
 }
 
 static void zmk_stp_indicators_caps(struct k_work *work) {
-    if (ble_status.prof) {
-        color0.h = 240;
-        color0.s = 100;
-    } else if (usb) {
-        color0.h = 120;
-        color0.s = 100;
+    if (usb) {
+        color1.h = 120;
+        color1.s = 100;
+    } else if (ble_status.prof) {
+        color1.h = 240;
+        color1.s = 100;
     } else
-        color0.s = 0;
+        color1.s = 0;
     // Set LED on if capslock pressed
     if (caps)
-        color0.b = CONFIG_ZMK_STP_INDICATORS_BRT_MAX;
+        color1.b = CONFIG_ZMK_STP_INDICATORS_BRT_MAX;
     else
-        color0.b = 0;
+        color1.b = 0;
     // Convert HSB to RGB and update the LEDs
-    pixels[0] = hsb_to_rgb(color0);
+    pixels[1] = hsb_to_rgb(color1);
     int err = led_strip_update_rgb(led_strip, pixels, STRIP_NUM_PIXELS);
     if (err < 0) {
         LOG_ERR("Failed to update the RGB strip (%d)", err);
@@ -291,13 +291,13 @@ static int zmk_stp_indicators_init(void) {
 
     color0 = (struct zmk_led_hsb){
         h : 240,
-        s : 0,
+        s : 100,
         b : CONFIG_ZMK_STP_INDICATORS_BRT_MAX,
     };
 
     color1 = (struct zmk_led_hsb){
         h : 240,
-        s : 100,
+        s : 0,
         b : CONFIG_ZMK_STP_INDICATORS_BRT_MAX,
     };
 
@@ -428,7 +428,7 @@ static int stp_indicators_event_listener(const zmk_event_t *eh) {
         LOG_DBG("INDICATOR CHANGED: %d", caps);
         if (!battery) {
             k_work_submit_to_queue(zmk_workqueue_lowprio_work_q(), &caps_ind_work);
-            k_work_submit_to_queue(zmk_workqueue_lowprio_work_q(), &bluetooth_ind_work);
+            // k_work_submit_to_queue(zmk_workqueue_lowprio_work_q(), &bluetooth_ind_work);
         }
         return 0;
     }
