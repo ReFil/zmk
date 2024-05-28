@@ -424,6 +424,12 @@ menu "Mouse Options"
 config ZMK_MOUSE
     bool "Enable ZMK mouse emulation"
 
+config ZMK_TRACKPAD
+    bool "trackpad mode"
+
+config ZMK_TRACKPAD_REVERSE_SCROLL
+    bool "Reverse Scroll Direction"
+
 #Mouse Options
 endmenu
 

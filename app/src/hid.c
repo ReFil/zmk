@@ -433,6 +433,13 @@ int zmk_hid_mouse_buttons_release(zmk_mouse_button_flags_t buttons) {
 }
 void zmk_hid_mouse_clear(void) { memset(&mouse_report.body, 0, sizeof(mouse_report.body)); }
 
+void zmk_hid_mouse_set(uint8_t buttons, int8_t xDelta, int8_t yDelta, int8_t scrollDelta) {
+    mouse_report.body.buttons = buttons;
+    mouse_report.body.d_x = xDelta;
+    mouse_report.body.d_y = yDelta;
+    mouse_report.body.d_wheel = scrollDelta;
+}
+
 #endif // IS_ENABLED(CONFIG_ZMK_MOUSE)
 
 struct zmk_hid_keyboard_report *zmk_hid_get_keyboard_report(void) { return &keyboard_report; }

@@ -302,6 +302,7 @@ int zmk_hid_mouse_button_release(zmk_mouse_button_t button);
 int zmk_hid_mouse_buttons_press(zmk_mouse_button_flags_t buttons);
 int zmk_hid_mouse_buttons_release(zmk_mouse_button_flags_t buttons);
 void zmk_hid_mouse_clear(void);
+void zmk_hid_mouse_set(uint8_t buttons, int8_t xDelta, int8_t yDelta, int8_t scrollDelta);
 #endif // IS_ENABLED(CONFIG_ZMK_MOUSE)
 
 struct zmk_hid_keyboard_report *zmk_hid_get_keyboard_report(void);
