@@ -18,6 +18,25 @@ LOG_MODULE_DECLARE(zmk, CONFIG_ZMK_LOG_LEVEL);
 
 #if DT_HAS_COMPAT_STATUS_OKAY(DT_DRV_COMPAT)
 
+static const struct behavior_parameter_value_metadata param_values[] = {
+    {
+        .value = STP_BAT,
+        .display_name = "Battery command",
+        .type = BEHAVIOR_PARAMETER_VALUE_TYPE_VALUE,
+    },
+
+};
+
+static const struct behavior_parameter_metadata_set param_metadata_set[] = {{
+    .param1_values = param_values,
+    .param1_values_len = ARRAY_SIZE(param_values),
+}};
+
+static const struct behavior_parameter_metadata metadata = {
+    .sets_len = ARRAY_SIZE(param_metadata_set),
+    .sets = param_metadata_set,
+};
+
 static int behavior_stp_indicators_init(const struct device *dev) { return 0; }
 
 static int on_keymap_binding_pressed(struct zmk_behavior_binding *binding,
@@ -42,6 +61,9 @@ static int on_keymap_binding_released(struct zmk_behavior_binding *binding,
 static const struct behavior_driver_api behavior_stp_indicators_driver_api = {
     .binding_pressed = on_keymap_binding_pressed,
     .binding_released = on_keymap_binding_released,
+#if IS_ENABLED(CONFIG_ZMK_BEHAVIOR_METADATA)
+    .parameter_metadata = &metadata,
+#endif // IS_ENABLED(CONFIG_ZMK_BEHAVIOR_METADATA)
 };
 
 BEHAVIOR_DT_INST_DEFINE(0, behavior_stp_indicators_init, NULL, NULL, NULL, POST_KERNEL,
