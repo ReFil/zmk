@@ -31,4 +31,13 @@ config ZMK_BATTERY_VOLTAGE_DIVIDER
 config ZMK_KEYBOARD_NAME
     default "Form"
 
+if ZMK_STUDIO
+config ZMK_STUDIO_RPC_RX_BUF_SIZE
+    default 128
+
+config ZMK_STUDIO_RPC_TX_BUF_SIZE
+    default 256
+
+endif
+
 endif # BOARD_STP
