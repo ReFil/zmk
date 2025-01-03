@@ -2,7 +2,7 @@
     behaviors {
         stp: behavior_stp_indicators {
             compatible = "zmk,behavior-stp-indicators";
-            label = "STP";
+            display-name = "Battery Level";
             #binding-cells = <1>;
         };
     };
