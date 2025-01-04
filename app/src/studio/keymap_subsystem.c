@@ -404,8 +404,17 @@ zmk_studio_Response move_layer(const zmk_studio_Request *req) {
     if (ret >= 0) {
         resp.which_result = zmk_keymap_SetActivePhysicalLayoutResponse_ok_tag;
         resp.result.ok.layers.funcs.encode = encode_keymap_layers;
-        populate_keymap_extra_props(&resp.result.ok);
+        resp.result.ok.max_layer_name_length = CONFIG_ZMK_KEYMAP_LAYER_NAME_MAX_LEN;
+        resp.result.ok.available_layers = 0;
 
+        for (zmk_keymap_layer_index_t index = 0; index < ZMK_KEYMAP_LAYERS_LEN; index++) {
+            zmk_keymap_layer_id_t id = zmk_keymap_layer_index_to_id(index);
+
+            if (id == UINT8_MAX) {
+                resp.result.ok.available_layers = ZMK_KEYMAP_LAYERS_LEN - index;
+                break;
+            }
+        }
         raise_zmk_studio_rpc_notification((struct zmk_studio_rpc_notification){
             .notification = KEYMAP_NOTIFICATION(unsaved_changes_status_changed, true)});
     } else {
