@@ -273,6 +273,31 @@ int zmk_stp_indicators_disable_batt() {
     return 0;
 }
 
+static int zmk_stp_indicators_resample(void) {
+    int rc = ext_power_enable(ext_power);
+    if (rc != 0) {
+        LOG_ERR("Unable to enable EXT_POWER: %d", rc);
+    }
+
+    ble_status = (struct zmk_stp_ble){
+        prof : zmk_ble_active_profile_index(),
+        open : zmk_ble_active_profile_is_open(),
+        connected : zmk_ble_active_profile_is_connected()
+    };
+    caps = (zmk_hid_indicators_get_current_profile() & ZMK_LED_CAPSLOCK_BIT);
+    usb = zmk_usb_is_powered();
+
+    k_work_submit_to_queue(zmk_workqueue_lowprio_work_q(), &bluetooth_ind_work);
+    k_work_submit_to_queue(zmk_workqueue_lowprio_work_q(), &caps_ind_work);
+}
+
+static void zmk_stp_indicators_resample_work(struct k_work *work) {
+    LOG_DBG("Resample work triggered");
+    zmk_stp_indicators_resample();
+}
+
+K_WORK_DELAYABLE_DEFINE(resample_work, zmk_stp_indicators_resample_work);
+
 static int zmk_stp_indicators_init(void) {
 
     LOG_DBG("Initialising STP indicators");
@@ -313,8 +338,7 @@ static int zmk_stp_indicators_init(void) {
     on = true;
     // Enable events
 
-    k_work_submit_to_queue(zmk_workqueue_lowprio_work_q(), &bluetooth_ind_work);
-    k_work_submit_to_queue(zmk_workqueue_lowprio_work_q(), &caps_ind_work);
+    k_work_schedule(&resample_work, K_MSEC(500));
 
     if (!events_en)
         events_en = true;
