@@ -20,6 +20,7 @@
             // |  SHIFT    |  Z  |  X  |  C  |  V  |  B  |  N  |  M  |  ,  |  .  | /   |    SHIFT |  UP  |  PG DN  |
             // |  CTL  |  WIN  |  ALT  |   SPACE   |  |  SPACE    | CTRL | MENU | ALT |  LEFT | DOWN | RIGHT |
             // ------------------------------------------------------------------------------------------------------------
+            display-name = "Base";
 
             bindings = <
             &kp ESC     &kp F1    &kp F2    &kp F3     &kp F4     &kp F5    &kp F6  &kp F7    &kp F8    &kp F9   &kp F10    &kp F11    &kp F12    &mo 1    &kp DEL  &kp INS
@@ -31,15 +32,37 @@
             >;
         };
 
-        raise {
+                raise {
+            display-name = "Fn";
             bindings = <
-            &none       &kp C_MUTE     &kp C_VOL_DN    &kp C_VOL_UP  &kp C_PREV  &kp C_PP       &kp C_NEXT  &bl BL_DEC  &bl BL_INC  &kp C_BRI_DN  &kp C_BRI_UP  &bt BT_CLR     &stp STP_BAT       &trans  &none  &none
+            &studio_unlock       &kp C_MUTE     &kp C_VOL_DN    &kp C_VOL_UP  &kp C_PREV  &kp C_PP       &kp C_NEXT  &bl BL_DEC  &bl BL_INC  &kp C_BRI_DN  &kp C_BRI_UP  &bt BT_CLR     &stp STP_BAT       &trans  &none  &none
             &none       &none          &none           &none         &none       &none          &none       &none       &none       &none         &none         &none          &none           &none      &none
             &none       &none          &kp C_MEDIA_WWW &none         &none       &kp C_MEDIA_TV &none      &none     &none        &none     &none    &none  &none       &sys_reset  &none
             &none       &none          &none     &none     &none    &none      &kp C_AC_HOME    &none      &none        &none      &none   &none      &bootloader  &none
             &none       &none          &none   &none      &none   &kp C_AC_BACK      &none      &none      &none       &none    &none  &none          &none       &none
             &none       &none          &none     &none    &none      &none      &none  &none        &none        &none  &none
             >;
+        };
+        extra1 {
+            status = "reserved";
+        };
+
+        extra2 {
+            status = "reserved";
+        };
+        extra3 {
+            status = "reserved";
+        };
+
+        extra4 {
+            status = "reserved";
+        };
+        extra5 {
+            status = "reserved";
+        };
+
+        extra6 {
+            status = "reserved";
         };
     };
 };

@@ -289,6 +289,8 @@ static int zmk_stp_indicators_resample(void) {
 
     k_work_submit_to_queue(zmk_workqueue_lowprio_work_q(), &bluetooth_ind_work);
     k_work_submit_to_queue(zmk_workqueue_lowprio_work_q(), &caps_ind_work);
+
+    return 0;
 }
 
 static void zmk_stp_indicators_resample_work(struct k_work *work) {
