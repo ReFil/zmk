@@ -72,15 +72,16 @@ static uint8_t keymap_layer_orders[ZMK_KEYMAP_LAYERS_LEN];
 
 #endif // IS_ENABLED(CONFIG_ZMK_KEYMAP_LAYER_REORDERING)
 
-#define KEYMAP_VAR(_name, _opts)                                                                   \
+#define KEYMAP_VAR(_name, _opts, no_init)                                                                   \
     static _opts struct zmk_behavior_binding _name[ZMK_KEYMAP_LAYERS_LEN][ZMK_KEYMAP_LEN] = {      \
         COND_CODE_0(no_init, (ZMK_KEYMAP_LAYERS_FOREACH_SEP(TRANSFORMED_LAYER, (, ))), (0))};
 
-KEYMAP_VAR(zmk_keymap, COND_CODE_1(IS_ENABLED(CONFIG_ZMK_KEYMAP_SETTINGS_STORAGE), (), (const)))
+KEYMAP_VAR(zmk_keymap, COND_CODE_1(IS_ENABLED(CONFIG_ZMK_KEYMAP_SETTINGS_STORAGE), (), (const)),
+           IS_ENABLED(CONFIG_ZMK_STUDIO))
 
 #if IS_ENABLED(CONFIG_ZMK_KEYMAP_SETTINGS_STORAGE)
 
-KEYMAP_VAR(zmk_stock_keymap, const)
+KEYMAP_VAR(zmk_stock_keymap, const, 0)
 
 static char zmk_keymap_layer_names[ZMK_KEYMAP_LAYERS_LEN][CONFIG_ZMK_KEYMAP_LAYER_NAME_MAX_LEN] = {
     ZMK_KEYMAP_LAYERS_FOREACH_SEP(LAYER_NAME, (, ))};
