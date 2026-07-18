@@ -954,6 +954,9 @@ int keymap_init(void) {
 #if IS_ENABLED(CONFIG_ZMK_KEYMAP_LAYER_REORDERING)
     load_stock_keymap_layer_ordering();
 #endif
+#if IS_ENABLED(CONFIG_ZMK_STUDIO)
+    reload_from_stock_keymap();
+#endif
 
     return 0;
 }
