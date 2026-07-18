@@ -74,7 +74,9 @@ static uint8_t keymap_layer_orders[ZMK_KEYMAP_LAYERS_LEN];
 
 #define KEYMAP_VAR(_name, _opts)                                                                   \
     static _opts struct zmk_behavior_binding _name[ZMK_KEYMAP_LAYERS_LEN][ZMK_KEYMAP_LEN] = {      \
-        COND_CODE_0(no_init, (ZMK_KEYMAP_LAYERS_FOREACH_SEP(TRANSFORMED_LAYER, (, ))), (0))};
+        COND_CODE_1(IS_ENABLED(CONFIG_ZMK_STUDIO),                                                 \
+                    (DT_INST_FOREACH_CHILD_SEP(0, TRANSFORMED_LAYER, (, ))),                       \
+                    (DT_INST_FOREACH_CHILD_STATUS_OKAY_SEP(0, TRANSFORMED_LAYER, (, ))))};
 
 KEYMAP_VAR(zmk_keymap, COND_CODE_1(IS_ENABLED(CONFIG_ZMK_KEYMAP_SETTINGS_STORAGE), (), (const)))
 
@@ -83,14 +85,14 @@ KEYMAP_VAR(zmk_keymap, COND_CODE_1(IS_ENABLED(CONFIG_ZMK_KEYMAP_SETTINGS_STORAGE
 KEYMAP_VAR(zmk_stock_keymap, const)
 
 static char zmk_keymap_layer_names[ZMK_KEYMAP_LAYERS_LEN][CONFIG_ZMK_KEYMAP_LAYER_NAME_MAX_LEN] = {
-    ZMK_KEYMAP_LAYERS_FOREACH_SEP(LAYER_NAME, (, ))};
+    DT_INST_FOREACH_CHILD_SEP(0, LAYER_NAME, (, ))};
 
 static uint32_t changed_layer_names = 0;
 
 #else
 
 static const char *zmk_keymap_layer_names[ZMK_KEYMAP_LAYERS_LEN] = {
-    ZMK_KEYMAP_LAYERS_FOREACH_SEP(LAYER_NAME, (, ))};
+    DT_INST_FOREACH_CHILD_SEP(0, LAYER_NAME, (, ))};
 
 #endif
 
