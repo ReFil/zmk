@@ -73,8 +73,15 @@ int zmk_behavior_invoke_binding(const struct zmk_behavior_binding *src_binding,
     const struct device *behavior = zmk_behavior_get_binding(binding.behavior_dev);
 
     if (!behavior) {
-        LOG_WRN("No behavior assigned to %d on layer %d", event.position, event.layer);
-        return 1;
+        behavior = (const void *)zmk_behavior_get_binding("TRANS");
+        if (!behavior) {
+            behavior = (const void *)zmk_behavior_get_binding("trans");
+            if (!behavior) {
+                LOG_WRN("No behavior assigned to %d on layer %d and no trans found", event.position,
+                        event.layer);
+                return 1;
+            }
+        }
     }
 
     int err = behavior_keymap_binding_convert_central_state_dependent_params(&binding, event);
