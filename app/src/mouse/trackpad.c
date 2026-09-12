@@ -65,8 +65,10 @@ static void handle_trackpad_ptp(const struct device *dev, const struct sensor_tr
     fingers[id.val1].touch_valid = confidence_tip.val1 & 0x01;
     fingers[id.val1].tip_switch = (confidence_tip.val1 & 0x02) >> 1;
     fingers[id.val1].contact_id = id.val1;
-    fingers[id.val1].x = x.val1;
-    fingers[id.val1].y = y.val1;
+    fingers[id.val1].x =
+        x.val1 < CONFIG_ZMK_TRACKPAD_LOGICAL_X ? x.val1 : CONFIG_ZMK_TRACKPAD_LOGICAL_X;
+    fingers[id.val1].y =
+        y.val1 < CONFIG_ZMK_TRACKPAD_LOGICAL_Y ? y.val1 : CONFIG_ZMK_TRACKPAD_LOGICAL_Y;
     contacts_to_send |= BIT(id.val1);
     received_contacts++;
 
