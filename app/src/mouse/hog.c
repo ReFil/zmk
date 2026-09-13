@@ -327,10 +327,11 @@ void send_ptp_report_callback(struct k_work *work) {
 K_WORK_DEFINE(hog_ptp_work, send_ptp_report_callback);
 
 int zmk_mouse_hog_send_ptp_report(struct zmk_hid_ptp_report_body *report) {
-    int err = k_msgq_put(&zmk_hog_ptp_msgq, report, K_MSEC(15));
+    int err = k_msgq_put(&zmk_hog_ptp_msgq, report, K_NO_WAIT);
     if (err) {
         switch (err) {
-        case -EAGAIN: {
+        case -EAGAIN:
+        case -ENOMSG: {
             LOG_WRN("Consumer message queue full, popping first message and queueing again");
             struct zmk_hid_ptp_report_body discarded_report;
             k_msgq_get(&zmk_hog_ptp_msgq, &discarded_report, K_NO_WAIT);
