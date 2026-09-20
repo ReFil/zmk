@@ -296,52 +296,34 @@ static struct k_work_q mouse_hog_work_q;
 
 #if IS_ENABLED(CONFIG_ZMK_TRACKPAD)
 
-K_MSGQ_DEFINE(zmk_hog_ptp_msgq, sizeof(struct zmk_hid_ptp_report_body),
-              CONFIG_ZMK_BLE_MOUSE_REPORT_QUEUE_SIZE, 4);
+struct zmk_hid_ptp_report_body hog_report;
 
 void send_ptp_report_callback(struct k_work *work) {
-    struct zmk_hid_ptp_report_body report;
-    while (k_msgq_get(&zmk_hog_ptp_msgq, &report, K_NO_WAIT) == 0) {
-        struct bt_conn *conn = destination_connection();
-        if (conn == NULL) {
-            return;
-        }
-
-        struct bt_gatt_notify_params notify_params = {
-            .attr = &mouse_hog_svc.attrs[3],
-            .data = &report,
-            .len = sizeof(report),
-        };
-
-        int err = bt_gatt_notify_cb(conn, &notify_params);
-        if (err == -EPERM) {
-            bt_conn_set_security(conn, BT_SECURITY_L2);
-        } else if (err) {
-            LOG_DBG("Error notifying %d", err);
-        }
-
-        bt_conn_unref(conn);
+    struct bt_conn *conn = destination_connection();
+    if (conn == NULL) {
+        return;
     }
+
+    struct bt_gatt_notify_params notify_params = {
+        .attr = &mouse_hog_svc.attrs[3],
+        .data = &hog_report,
+        .len = sizeof(hog_report),
+    };
+
+    int err = bt_gatt_notify_cb(conn, &notify_params);
+    if (err == -EPERM) {
+        bt_conn_set_security(conn, BT_SECURITY_L2);
+    } else if (err) {
+        LOG_DBG("Error notifying %d", err);
+    }
+
+    bt_conn_unref(conn);
 };
 
 K_WORK_DEFINE(hog_ptp_work, send_ptp_report_callback);
 
 int zmk_mouse_hog_send_ptp_report(struct zmk_hid_ptp_report_body *report) {
-    int err = k_msgq_put(&zmk_hog_ptp_msgq, report, K_NO_WAIT);
-    if (err) {
-        switch (err) {
-        case -EAGAIN:
-        case -ENOMSG: {
-            LOG_WRN("Consumer message queue full, popping first message and queueing again");
-            struct zmk_hid_ptp_report_body discarded_report;
-            k_msgq_get(&zmk_hog_ptp_msgq, &discarded_report, K_NO_WAIT);
-            return zmk_mouse_hog_send_ptp_report(report);
-        }
-        default:
-            LOG_WRN("Failed to queue mouse report to send (%d)", err);
-            return err;
-        }
-    }
+    hog_report = report;
 
     k_work_submit_to_queue(&mouse_hog_work_q, &hog_ptp_work);
 
