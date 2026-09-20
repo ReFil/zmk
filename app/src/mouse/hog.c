@@ -323,7 +323,7 @@ void send_ptp_report_callback(struct k_work *work) {
 K_WORK_DEFINE(hog_ptp_work, send_ptp_report_callback);
 
 int zmk_mouse_hog_send_ptp_report(struct zmk_hid_ptp_report_body *report) {
-    hog_report = report;
+    hog_report = *report;
 
     k_work_submit_to_queue(&mouse_hog_work_q, &hog_ptp_work);
 
