@@ -17,7 +17,6 @@ LOG_MODULE_DECLARE(zmk, CONFIG_ZMK_LOG_LEVEL);
 const struct device *trackpad = DEVICE_DT_GET(DT_INST(0, cirque_gen4));
 
 static zmk_trackpad_finger_contacts_t present_contacts = 0;
-static zmk_trackpad_finger_contacts_t contacts_to_send = 0;
 static zmk_trackpad_finger_contacts_t received_contacts = 0;
 
 static uint8_t btns;
@@ -69,41 +68,38 @@ static void handle_trackpad_ptp(const struct device *dev, const struct sensor_tr
         x.val1 < CONFIG_ZMK_TRACKPAD_LOGICAL_X ? x.val1 : CONFIG_ZMK_TRACKPAD_LOGICAL_X;
     fingers[id.val1].y =
         y.val1 < CONFIG_ZMK_TRACKPAD_LOGICAL_Y ? y.val1 : CONFIG_ZMK_TRACKPAD_LOGICAL_Y;
-    contacts_to_send |= BIT(id.val1);
     received_contacts++;
 
     // LOG_DBG("total contacts: %d, received contacts: %d", present_contacts, received_contacts);
 
     if ((present_contacts == received_contacts) && surface_mode) {
-        LOG_DBG("total contacts: %d, received contacts: %d, bitmap contacts %d", present_contacts,
-                received_contacts, contacts_to_send);
+        // Sort fingers down
+        struct zmk_ptp_finger report[CONFIG_ZMK_TRACKPAD_FINGERS] = {0};
+        uint8_t present = 0;
+
+        for (int i = 0; i < CONFIG_ZMK_TRACKPAD_FINGERS; i++)
+            // Sort on tip switch as confidence is fairly meaningless
+            if (fingers[i].tip_switch)
+                report[present++] = fingers[i];
+
 #if CONFIG_ZMK_TRACKPAD_FINGERS == 5
-        zmk_hid_ptp_set((contacts_to_send & BIT(0)) ? fingers[0] : empty_finger,
-                        (contacts_to_send & BIT(1)) ? fingers[1] : empty_finger,
-                        (contacts_to_send & BIT(2)) ? fingers[2] : empty_finger,
-                        (contacts_to_send & BIT(3)) ? fingers[3] : empty_finger,
-                        (contacts_to_send & BIT(4)) ? fingers[4] : empty_finger, present_contacts,
-                        scantime, button_mode ? btns : 0);
+        zmk_hid_ptp_set(report[0], report[1], report[2], report[3], report[4], present, scantime,
+                        button_mode ? btns : 0);
 #elif CONFIG_ZMK_TRACKPAD_FINGERS == 4
-        zmk_hid_ptp_set((contacts_to_send & BIT(0)) ? fingers[0] : empty_finger,
-                        (contacts_to_send & BIT(1)) ? fingers[1] : empty_finger,
-                        (contacts_to_send & BIT(2)) ? fingers[2] : empty_finger,
-                        (contacts_to_send & BIT(3)) ? fingers[3] : empty_finger, empty_finger,
-                        present_contacts, scantime, button_mode ? btns : 0);
+        zmk_hid_ptp_set(report[0], report[1], report[2], report[3], empty_finger, present, scantime,
+                        button_mode ? btns : 0);
 #else
-        zmk_hid_ptp_set((contacts_to_send & BIT(0)) ? fingers[0] : empty_finger,
-                        (contacts_to_send & BIT(1)) ? fingers[1] : empty_finger,
-                        (contacts_to_send & BIT(2)) ? fingers[2] : empty_finger, empty_finger,
-                        empty_finger, present_contacts, scantime, button_mode ? btns : 0);
+        zmk_hid_ptp_set(report[0], report[1], report[2], empty_finger, empty_finger, present,
+                        scantime, button_mode ? btns : 0);
 #endif
+        LOG_DBG("total contacts: %d, received contacts: %d", present_contacts, received_contacts);
+
         zmk_endpoints_send_ptp_report();
-        contacts_to_send = 0;
         received_contacts = 0;
     } else if (!surface_mode) {
         zmk_hid_ptp_set(empty_finger, empty_finger, empty_finger, empty_finger, empty_finger, 0,
                         scantime, button_mode ? btns : 0);
         zmk_endpoints_send_ptp_report();
-        contacts_to_send = 0;
         received_contacts = 0;
     }
 
